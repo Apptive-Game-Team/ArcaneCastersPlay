@@ -7,8 +7,8 @@
     "theme_color": "#000",
     "description": "",
     "icons": [{
-      "src": "TemplateData/wordventure-logo-flat.png",
-      "sizes": "144x144",
+      "src": "TemplateData/arcanecasters-logo.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }]
