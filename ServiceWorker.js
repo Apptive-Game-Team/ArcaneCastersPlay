@@ -1,8 +1,8 @@
-const cacheName = "Team 6515-Word Online Client-1.1.1";
+const cacheName = "Team 6515-Arcane Casters-1.1.1";
 const contentToCache = [
   "Build/bb0d9ecdb05db3e84da20bd14a4f84dc.loader.js",
   "Build/0e7231b141a4b72b98677fbe7eb18b57.framework.js",
-  "Build/90f94c09046036fe408d78890c6ee352.data",
+  "Build/108f449587971c83082400308cf68efc.data",
   "Build/5d07e31c941aacfb5b4c4dc9dc85f1da.wasm",
   "TemplateData/style.css"
 ];
