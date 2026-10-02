@@ -2,7 +2,7 @@ const cacheName = "Team 6515-Arcane Casters-1.2.0";
 const contentToCache = [
   "Build/bb0d9ecdb05db3e84da20bd14a4f84dc.loader.js",
   "Build/189e5db01c2510804c165c472bf3390e.framework.js",
-  "Build/f150140ce024acf6b88206be3ee33fb9.data",
+  "Build/1f0f00a6a45e3da088b64b013cfdf3d5.data",
   "Build/518a303df256010f90c170ae1c5e5a3a.wasm",
   "TemplateData/style.css"
 ];
