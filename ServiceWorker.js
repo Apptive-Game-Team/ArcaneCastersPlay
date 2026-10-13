@@ -1,4 +1,7 @@
-const cacheName = "Team 6515-Arcane Casters-1.4.0";
+// The version only moves on a promotion, so every dev build would share one
+// cache name. DATA_FILENAME is content-hashed (webGLNameFilesAsHashes), which
+// gives each build its own cache and lets activate drop the previous ones.
+const cacheName = "Team 6515-Arcane Casters-1.4.0-1a3caca4713ef70ad37013be17f001cb.data";
 const contentToCache = [
   "Build/bb0d9ecdb05db3e84da20bd14a4f84dc.loader.js",
   "Build/ac11b9cb7b85294c50f18fb8a366ccf6.framework.js",
@@ -16,40 +19,72 @@ self.addEventListener('install', (e) => {
   self.skipWaiting();
 });
 
-self.addEventListener('fetch', (e) => {
-  
-  if (e.request.url.endsWith("index.html")) {
-        e.respondWith(fetch(e.request));
-    }
-  
-  const req = e.request;
-  if (req.method !== 'GET') return;
-  
-  const url = new URL(req.url);
-  const sameOrigin = url.origin === self.location.origin;
+// Without this, caches from earlier builds stay forever and keep answering
+// requests: an old favicon outlived the icon change because of it.
+self.addEventListener('activate', (e) => {
+  e.waitUntil((async () => {
+    const names = await caches.keys();
+    await Promise.all(names.filter(n => n !== cacheName).map(n => caches.delete(n)));
+    await self.clients.claim();
+  })());
+});
 
-  const isUnityResource = url.pathname.includes('/Build/') ||
-      url.pathname.includes('/TemplateData/') ||
-      /\.(js|css|wasm|data|unityweb)$/i.test(url.pathname);
+async function fetchAndStore(req) {
+  const resp = await fetch(req);
+  if (resp.ok && resp.type !== 'opaque') {
+    const cache = await caches.open(cacheName);
+    await cache.put(req, resp.clone());
+  }
+  return resp;
+}
+
+// Build/ files carry a content hash in their name, so a cached copy is never stale.
+async function cacheFirst(req) {
+  const cache = await caches.open(cacheName);
+  const hit = await cache.match(req);
+  if (hit) return hit;
+  try {
+    return await fetchAndStore(req);
+  } catch (err) {
+    return new Response('', {status: 504, statusText: 'Gateway Timeout'});
+  }
+}
+
+// Everything else keeps its name across builds (TemplateData/, icons, manifest),
+// so ask the network first and fall back to the cache only when offline.
+async function networkFirst(req) {
+  try {
+    return await fetchAndStore(req);
+  } catch (err) {
+    const cache = await caches.open(cacheName);
+    const hit = await cache.match(req);
+    return hit || new Response('', {status: 504, statusText: 'Gateway Timeout'});
+  }
+}
+
+self.addEventListener('fetch', (e) => {
+  const req = e.request;
+
+  if (req.url.endsWith("index.html")) {
+    e.respondWith(fetch(req));
+    return;
+  }
+
+  if (req.method !== 'GET') return;
+
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
+  if (url.pathname.includes('/Build/')) {
+    e.respondWith(cacheFirst(req));
+    return;
+  }
 
   const isStaticAsset =
-    sameOrigin && /\.(js|css|wasm|data|png|jpg|jpeg|gif|webp|svg|ico)$/i.test(url.pathname);
+    url.pathname.includes('/TemplateData/') ||
+    /\.(js|css|wasm|data|unityweb|png|jpg|jpeg|gif|webp|svg|ico|webmanifest)$/i.test(url.pathname);
 
-  if (sameOrigin && (isUnityResource || isStaticAsset)) {
-
-    e.respondWith((async () => {
-      const hit = await caches.match(req);
-      if (hit) return hit;
-      try {
-        const resp = await fetch(req);
-        if (resp.ok && resp.type !== 'opaque') {
-          const cache = await caches.open(cacheName);
-          await cache.put(req, resp.clone());
-        }
-        return resp;
-      } catch (err) {
-        return new Response('', {status: 504, statusText: 'Gateway Timeout'});
-      }
-    })());
+  if (isStaticAsset) {
+    e.respondWith(networkFirst(req));
   }
 });
