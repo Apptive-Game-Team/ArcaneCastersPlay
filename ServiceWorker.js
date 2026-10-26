@@ -1,12 +1,12 @@
 // The version only moves on a promotion, so every dev build would share one
 // cache name. DATA_FILENAME is content-hashed (webGLNameFilesAsHashes), which
 // gives each build its own cache and lets activate drop the previous ones.
-const cacheName = "Team 6515-Arcane Casters-1.5.0-24cbf6f414b1320c6a619fad7f57874a.data";
+const cacheName = "Team 6515-Arcane Casters-1.5.0-4f25772ccc1cd5dfbc85eab8134e0f2d.data";
 const contentToCache = [
   "Build/bb0d9ecdb05db3e84da20bd14a4f84dc.loader.js",
-  "Build/9895cf9aae68950f7f0a4b6a8ea62acd.framework.js",
-  "Build/24cbf6f414b1320c6a619fad7f57874a.data",
-  "Build/2a7d05e83f520696c305ca97a048167e.wasm",
+  "Build/6a3e9768dc14e576245d96494e33580f.framework.js",
+  "Build/4f25772ccc1cd5dfbc85eab8134e0f2d.data",
+  "Build/034321797ab0f24666bd980501ed3742.wasm",
   "TemplateData/style.css"
 ];
 
